@@ -146,6 +146,39 @@ async def chat_completion(tenant_id, chat_id):
         return get_result(data=answer)
 
 
+@manager.route("/customAsk", methods=["POST"])  # noqa: F821
+@token_required
+async def customAsk(tenant_id):
+    req = await request.json
+    if not req.get("question"):
+        return get_error_data_result("`question` is required.")
+    # Prepare search configuration
+    search_config = {}
+    search_id = req.get("search_id", "")
+    if search_id:
+        search_app = SearchService.get_detail(search_id)
+        if search_app:
+            search_config = search_app.get("search_config", {})
+
+    def stream():
+        nonlocal req, tenant_id, search_config
+        try:
+            for ans in ask(req["question"], req["kb_ids"], tenant_id, search_config=search_config):
+                yield "data:" + json.dumps({"code": 0, "message": "", "data": ans}, ensure_ascii=False) + "\n\n"
+        except Exception as e:
+            yield "data:" + json.dumps(
+                {"code": 500, "message": str(e), "data": {"answer": "**ERROR**: " + str(e), "reference": []}},
+                ensure_ascii=False) + "\n\n"
+        yield "data:" + json.dumps({"code": 0, "message": "", "data": True}, ensure_ascii=False) + "\n\n"
+
+    resp = Response(stream(), mimetype="text/event-stream")
+    resp.headers.add_header("Cache-control", "no-cache")
+    resp.headers.add_header("Connection", "keep-alive")
+    resp.headers.add_header("X-Accel-Buffering", "no")
+    resp.headers.add_header("Content-Type", "text/event-stream; charset=utf-8")
+    return resp
+
+
 @manager.route("/chats_openai/<chat_id>/chat/completions", methods=["POST"])  # noqa: F821
 @validate_request("model", "messages")  # noqa: F821
 @token_required
