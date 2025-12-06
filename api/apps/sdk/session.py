@@ -163,7 +163,7 @@ async def customAsk(tenant_id):
     def stream():
         nonlocal req, tenant_id, search_config
         try:
-            for ans in ask(req["question"], req["kb_ids"], tenant_id, search_config=search_config):
+                for ans in ask(req["question"], req["kb_ids"], tenant_id, search_config=search_config):
                 yield "data:" + json.dumps({"code": 0, "message": "", "data": ans}, ensure_ascii=False) + "\n\n"
         except Exception as e:
             yield "data:" + json.dumps(
@@ -971,14 +971,15 @@ async def ask_about_embedded():
 
 @manager.route("/searchbots/retrieval_test", methods=["POST"])  # noqa: F821
 @validate_request("kb_id", "question")
+@token_required
 async def retrieval_test_embedded():
     token = request.headers.get("Authorization").split()
-    if len(token) != 2:
-        return get_error_data_result(message='Authorization is not valid!"')
-    token = token[1]
-    objs = APIToken.query(beta=token)
-    if not objs:
-        return get_error_data_result(message='Authentication error: API key is invalid!"')
+#     if len(token) != 2:
+#         return get_error_data_result(message='Authorization is not valid!"')
+#     token = token[1]
+#     objs = APIToken.query(beta=token)
+#     if not objs:
+#         return get_error_data_result(message='Authentication error: API key is invalid!"')
 
     req = await request.json
     page = int(req.get("page", 1))
