@@ -164,7 +164,7 @@ async def customAsk(tenant_id):
         nonlocal req, tenant_id, search_config
         try:
                 for ans in ask(req["question"], req["kb_ids"], tenant_id, search_config=search_config):
-                yield "data:" + json.dumps({"code": 0, "message": "", "data": ans}, ensure_ascii=False) + "\n\n"
+                    yield "data:" + json.dumps({"code": 0, "message": "", "data": ans}, ensure_ascii=False) + "\n\n"
         except Exception as e:
             yield "data:" + json.dumps(
                 {"code": 500, "message": str(e), "data": {"answer": "**ERROR**: " + str(e), "reference": []}},
