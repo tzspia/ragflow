@@ -24,7 +24,7 @@ from api.db.services.search_service import SearchService
 from api.db.services.user_service import TenantService, UserTenantService
 from common.misc_utils import get_uuid
 from common.constants import RetCode, StatusEnum
-from api.utils.api_utils import get_data_error_result, get_json_result, not_allowed_parameters, server_error_response, validate_request
+from api.utils.api_utils import get_data_error_result, get_json_result, not_allowed_parameters, server_error_response, token_required,validate_request
 
 
 @manager.route("/create", methods=["post"])  # noqa: F821
