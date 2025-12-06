@@ -249,11 +249,15 @@ def register_page(page_path):
     spec = spec_from_file_location(module_name, page_path)
     page = module_from_spec(spec)
     page.app = app
-    page.manager = Blueprint(page_name, module_name)
+    
+    # 为sdk目录下的文件添加sdk前缀以避免名称冲突
+    sdk_path = "\\sdk\\" if sys.platform.startswith("win") else "/sdk/"
+    blueprint_name = f"sdk_{page_name}" if sdk_path in path else page_name
+    
+    page.manager = Blueprint(blueprint_name, module_name)
     sys.modules[module_name] = page
     spec.loader.exec_module(page)
     page_name = getattr(page, "page_name", page_name)
-    sdk_path = "\\sdk\\" if sys.platform.startswith("win") else "/sdk/"
     url_prefix = (
         f"/api/{API_VERSION}" if sdk_path in path else f"/{API_VERSION}/{page_name}"
     )
