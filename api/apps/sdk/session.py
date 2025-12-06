@@ -972,8 +972,8 @@ async def ask_about_embedded():
 @manager.route("/searchbots/retrieval_test", methods=["POST"])  # noqa: F821
 @validate_request("kb_id", "question")
 @token_required
-async def retrieval_test_embedded():
-    token = request.headers.get("Authorization").split()
+async def retrieval_test_embedded(tenant_id):
+#     token = request.headers.get("Authorization").split()
 #     if len(token) != 2:
 #         return get_error_data_result(message='Authorization is not valid!"')
 #     token = token[1]
@@ -999,9 +999,9 @@ async def retrieval_test_embedded():
     langs = req.get("cross_languages", [])
     tenant_ids = []
 
-    tenant_id = objs[0].tenant_id
-    if not tenant_id:
-        return get_error_data_result(message="permission denined.")
+#     tenant_id = objs[0].tenant_id
+#     if not tenant_id:
+#         return get_error_data_result(message="permission denined.")
 
     if req.get("search_id", ""):
         search_config = SearchService.get_detail(req.get("search_id", "")).get("search_config", {})
